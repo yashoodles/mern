@@ -1,0 +1,13 @@
+FROM node:10.16-alpine as builder
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+FROM nginx
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY ./default.conf /etc/nginx/conf.d/nginx.conf
+EXPOSE 80
+CMD [ "nginx", "-g", "daemon off;" ]
+
